@@ -1,0 +1,7 @@
+import { authHeaders, request } from "../api";
+
+export default function PeoplePage({ token, users, setUsers, onMessage, onError }) {
+  async function setRole(id, role) { try { const updated = await request(`/users/${id}/role?role=${role}`, { method: "PATCH", headers: authHeaders(token) }); setUsers(users.map((item) => item.id === id ? updated : item)); onMessage("Role updated."); } catch (err) { onError(err.message); } }
+  return <div className="page-stack"><section className="split-heading"><div><p className="eyebrow orange">ACCESS CONTROL</p><h2>People & roles</h2><p className="muted">Give each teammate the least privilege needed for their campaign work.</p></div><span className="role-badge">Admin only</span></section><section className="panel people-panel"><div className="panel-heading"><div><p className="eyebrow orange">TEAM DIRECTORY</p><h2>{users.length} workspace members</h2></div></div>{users.map((item) => <div className="person-row" key={item.id}><div className="person-avatar">{item.name.slice(0, 1).toUpperCase()}</div><div className="person-detail"><strong>{item.name}</strong><small>{item.email}</small></div><select value={item.role} onChange={(event) => setRole(item.id, event.target.value)}><option value="contributor">Contributor</option><option value="approver">Approver</option><option value="publisher">Publisher</option><option value="admin">Admin</option></select><span className={item.is_active ? "active-label" : "inactive-label"}>{item.is_active ? "Active" : "Disabled"}</span></div>)}</section></div>;
+}
+
